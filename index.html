@@ -1,14 +1,43 @@
 <!DOCTYPE HTML>
 
-<html>
+<html style="min-height: 100%;">
 <head>
 </head>
-<body>
-Convert hex to binary<br/>
-<textarea id="hex2bin_in" placeholder="48 65 78 20 64 61 74 61 20 68 65 72 65 2e 2e 2e ..." rows="10" cols="80"></textarea>
-<textarea id="hex2bin_out" placeholder=""  rows="10" cols="80"></textarea><br/>
-<button id="hex2bin_cvt" name="Convert" value="Convert!">Convert</button>
-<script src="tools.js"></script>
+<body style="min-height: 100%;">
+<div style="display: inline-block;">
+    <textarea id="conv_in" placeholder="48 65 78 20 64 61 74 61 20 68 65 72 65 2e 2e 2e ..." rows="10" cols="80"></textarea><br/>
+    Interpret input as:
+    <label style="display:block"><input type="radio" name="fmt_in" value="hexstream" checked  > Hex Stream    </label>
+    <label style="display:block"><input type="radio" name="fmt_in" value="binary"             > Binary Stream </label>
+    <label style="display:block"><input type="radio" name="fmt_in" value="utf8"               > UTF-8         </label>
+    <label style="display:block"><input type="radio" name="fmt_in" value="utf16"              > UTF-16        </label>
+    <label style="display:block"><input type="radio" name="fmt_in" value="utf32"              > UTF-32        </label>
+</div>
+<div  style="display: inline-block;">
+    <textarea id="conv_out" placeholder=""  rows="10" cols="80"></textarea><br/>
+    Output as:
+    <label style="display:block"><input type="radio" name="fmt_out" value="hexstream" checked > Hex Stream    </label>
+    <label style="display:block"><input type="radio" name="fmt_out" value="binary"            > Binary Stream </label>
+    <label style="display:block"><input type="radio" name="fmt_out" value="utf8"              > UTF-8         </label>
+    <label style="display:block"><input type="radio" name="fmt_out" value="utf16"             > UTF-16        </label>
+    <label style="display:block"><input type="radio" name="fmt_out" value="utf32"             > UTF-32        </label>
+</div><br/><br/>
+<button id="conv_cvt" name="Convert" value="Convert!">Convert</button>
+
+<div style="height: 300px; position: relative; background-color: #CCC; margin-top: 20px; overflow: auto;">
+<pre id="diagnostics">
+</pre>
+</div>
+
+<script src="convert/common.js"></script>
+<script src="convert/format.js"></script>
+<script src="convert/numutil.js"></script>
+<script src="convert/hex.js"></script>
+<script src="convert/utf8.js"></script>
+<script src="convert/utf16.js"></script>
+<script src="convert/utf32.js"></script>
+<script src="convert/binary.js"></script>
+<script src="convert.js"></script>
 
 </body>
 </html>
