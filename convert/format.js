@@ -17,7 +17,7 @@ var format = {
         },
         //Input is already a big endian stream.
         big: function(str, byteSize = 8, wordLen = 4){
-            return out;
+            return str;
         }
     },
     spacing: {

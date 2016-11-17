@@ -1,14 +1,14 @@
-conversions["hexstream"] = {
-    hexList: "0123456789ABCDEF",
-    binList: [ 
+conversions["hexstream"] = function(){
+    this.hexList = "0123456789ABCDEF";
+    this.binList = [ 
         "0000", "0001", "0010", "0011",
         "0100", "0101", "0110", "0111", 
         "1000", "1001", "1010", "1011",
         "1100", "1101", "1110", "1111"
-    ],
-    placeholder: "48 65 78 20 64 61 74 61 20 68 65 72 65 2e 2e 2e ...",
+    ];
+    this.placeholder = "48 65 78 20 64 61 74 61 20 68 65 72 65 2e 2e 2e ...";
 
-    toBin: function ( input ){
+    this.toBin = function ( input ){
         var out = "";
         var count = 0;
         var str = input.toUpperCase();
@@ -22,9 +22,9 @@ conversions["hexstream"] = {
             }
         }
         return out;
-    },
+    };
 
-    fromBin : function ( str ){
+    this.fromBin = function ( str ){
         var out = "";
         var temp = "";
         var count = 0;
@@ -51,6 +51,6 @@ conversions["hexstream"] = {
             state.truncatedInput(null, "bit", temp.length, 4);
         }
         return out;
-    }
+    };
 };
 

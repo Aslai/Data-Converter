@@ -2,29 +2,95 @@
 
 <html style="min-height: 100%;">
 <head>
+<style>
+.float_r {
+    float: right;
+}
+.outline {
+    border: 1px solid rgba(123, 123, 123, 0.6);
+    background-color: #EEE;
+}
+.inline {
+    border: 1px solid rgba(123, 123, 123, 0.6);
+    background-color: #FFF;
+}
+.wrap {
+    display: inline-block; 
+    position: relative;
+    margin: 3px;
+    margin-left: 6px;
+    margin-right: 6px;
+    padding: 4px;
+}
+.lower{
+    position: relative;
+    padding: 4px;
+    margin-top: 4px;
+}
+.fmt_block {
+    display: inline-block; 
+    position: relative;
+    width: 40%;
+    padding: 4px;
+    height: 100%;
+}
+.opts_block {
+    display: inline-block; 
+    float: right;
+    width: 50%;
+    padding: 4px;
+}
+h3 {
+    margin: 4px;
+}
+</style>
 </head>
 <body style="min-height: 100%;">
-<div style="display: inline-block;">
+<div class="wrap outline">
+<center><h3>Input</h3></center>
     <textarea id="conv_in" placeholder="48 65 78 20 64 61 74 61 20 68 65 72 65 2e 2e 2e ..." rows="10" cols="80"></textarea><br/>
-    Interpret input as:
-    <label style="display:block"><input type="radio" name="fmt_in" value="hexstream" checked  > Hex Stream    </label>
-    <label style="display:block"><input type="radio" name="fmt_in" value="binary"             > Binary Stream </label>
-    <label style="display:block"><input type="radio" name="fmt_in" value="utf8"               > UTF-8         </label>
-    <label style="display:block"><input type="radio" name="fmt_in" value="utf16"              > UTF-16        </label>
-    <label style="display:block"><input type="radio" name="fmt_in" value="utf32"              > UTF-32        </label>
+    <div class="lower">
+        Interpret as:
+    <div class="lower inline">
+    <div class="fmt_block">
+        <label style="display:block"><input type="radio" name="fmt_in" value="hexstream" checked  > Hex Stream    </label>
+        <label style="display:block"><input type="radio" name="fmt_in" value="base64"             > Base64        </label>
+        <label style="display:block"><input type="radio" name="fmt_in" value="binary"             > Binary Stream </label>
+        <label style="display:block"><input type="radio" name="fmt_in" value="utf8"               > UTF-8         </label>
+        <label style="display:block"><input type="radio" name="fmt_in" value="utf16"              > UTF-16        </label>
+        <label style="display:block"><input type="radio" name="fmt_in" value="utf32"              > UTF-32        </label>
+    </div>
+    <div id="opts_in" class="opts_block">
+    
+    </div>
+    </div>
+    </div>
+    <button id="conv_cvt" name="Convert" value="Convert!" style="width: 100%" >Convert</button>
 </div>
-<div  style="display: inline-block;">
+<div class="wrap outline float_r">
+<center><h3>Output</h3></center>
     <textarea id="conv_out" placeholder=""  rows="10" cols="80"></textarea><br/>
-    Output as:
-    <label style="display:block"><input type="radio" name="fmt_out" value="hexstream" checked > Hex Stream    </label>
-    <label style="display:block"><input type="radio" name="fmt_out" value="binary"            > Binary Stream </label>
-    <label style="display:block"><input type="radio" name="fmt_out" value="utf8"              > UTF-8         </label>
-    <label style="display:block"><input type="radio" name="fmt_out" value="utf16"             > UTF-16        </label>
-    <label style="display:block"><input type="radio" name="fmt_out" value="utf32"             > UTF-32        </label>
-</div><br/><br/>
-<button id="conv_cvt" name="Convert" value="Convert!">Convert</button>
+    <div class="lower">
+        Interpret as:
+        <div class="lower inline">
+    <div class="fmt_block">
+        <label style="display:block"><input type="radio" name="fmt_out" value="hexstream" checked > Hex Stream    </label>
+        <label style="display:block"><input type="radio" name="fmt_out" value="base64"            > Base64        </label>
+        <label style="display:block"><input type="radio" name="fmt_out" value="binary"            > Binary Stream </label>
+        <label style="display:block"><input type="radio" name="fmt_out" value="utf8"              > UTF-8         </label>
+        <label style="display:block"><input type="radio" name="fmt_out" value="utf16"             > UTF-16        </label>
+        <label style="display:block"><input type="radio" name="fmt_out" value="utf32"             > UTF-32        </label>
+    </div>
+    <div id="opts_out" class="opts_block">
+    
+    </div>
+    </div>
+    </div>
+</div>
 
-<div style="height: 300px; position: relative; background-color: #CCC; margin-top: 20px; overflow: auto;">
+<br/><br/>
+
+<div style="min-height: 300px; position: relative; background-color: #CCC; margin-top: 20px; overflow: auto;min-width: 100%; margin: 0 auto">
 <pre id="diagnostics">
 </pre>
 </div>
@@ -33,6 +99,7 @@
 <script src="convert/format.js"></script>
 <script src="convert/numutil.js"></script>
 <script src="convert/hex.js"></script>
+<script src="convert/base64.js"></script>
 <script src="convert/utf8.js"></script>
 <script src="convert/utf16.js"></script>
 <script src="convert/utf32.js"></script>

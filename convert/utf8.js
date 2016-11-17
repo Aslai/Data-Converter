@@ -1,5 +1,5 @@
-conversions["utf8"] = {
-    char: {
+conversions["utf8"] = function() {
+    this.char = {
         fromCodepoint: function ( codepoint ){
             var out = "";
             if( codepoint < 1 << 7 ){
@@ -84,10 +84,10 @@ conversions["utf8"] = {
             }
             return jsnum.fromBin(out);
         }
-    },
-    placeholder: "Some Unicode string ...",
+    };
+    this.placeholder = "Some Unicode string ...";
 
-    toBin: function ( str ){
+    this.toBin = function ( str ){
         var out = "";
         var i;
         for( i = 0; i < str.length; ++i ){
@@ -102,39 +102,40 @@ conversions["utf8"] = {
             }
         }
         return out;
-    },
-    fromBin: function ( str ){
+    };
+    
+    this.fromBin = function ( str ){
         var out = "";
         var temp = "";
         var goal = 8;
         var i;
         for( i = 0; i < str.length; ++i ){
-        if( str[i] == "0" || str[i] == "1" ){
-            temp += str[i];
-        }
-        else{
-            state.invalidInput("Non-binary data.", str[i], i);
-        }
-        if( temp.length >= goal ){
-            var newgoal = this.char.length(temp) * 8;
-                if( goal != newgoal ){
-                goal = newgoal;
-                continue;
-            }
-            var newchar = this.char.toCodepoint(temp);
-            if( newchar > 0 ){
-                out += String.fromCodePoint(newchar);
+            if( str[i] == "0" || str[i] == "1" ){
+                temp += str[i];
             }
             else{
-                state.invalidInput("Non-character data.", temp, i - 7);
+                state.invalidInput("Non-binary data.", str[i], i);
             }
-            temp = "";
-            goal = 8;
-        }
+            if( temp.length >= goal ){
+                var newgoal = this.char.length(temp) * 8;
+                    if( goal != newgoal ){
+                    goal = newgoal;
+                    continue;
+                }
+                var newchar = this.char.toCodepoint(temp);
+                if( newchar > 0 ){
+                    out += String.fromCodePoint(newchar);
+                }
+                else{
+                    state.invalidInput("Non-character data.", temp, i - 7);
+                }
+                temp = "";
+                goal = 8;
+            }
         }
         if( temp.length > 0 ){
             state.truncatedInput("The last codepoint could not be completed. Make sure you have the correct number of bits for the last character.", "bit", temp.length, goal);
         }
         return out;
-    }
+    };
 }

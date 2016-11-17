@@ -1,6 +1,19 @@
-conversions["utf32"] = {
-    placeholder: "Some Unicode string ...",
-    toBin: function ( str ){
+conversions["utf32"] = function(){
+    this.placeholder = "Some Unicode string ...";
+    this.endian = format.endian.big;
+    this.byteSize = 8;
+    this.config = [
+        { 
+            name: "Endianness:",
+            type: "combo",
+            selected: 0,
+            options: [
+                { name: "Little Endian", set: { endian: format.endian.little } },
+                { name: "Big Endian", set: { endian: format.endian.big } }
+            ]
+        }
+    ];
+    this.toBin = function ( str ){
         var out = "";
         var i;
         for( i = 0; i < str.length; ++i ){
@@ -12,10 +25,10 @@ conversions["utf32"] = {
                 out += jsnum.toBin(codepoint, 32);
             }
         }
-        return out;
-    },
+        return this.endian(out, this.byteSize, 32/this.byteSize);
+    };
 
-    fromBin: function ( str ){
+    this.fromBin = function ( str ){
         var out = "";
         var temp = "";
         var count = 0;
@@ -28,6 +41,7 @@ conversions["utf32"] = {
                 state.invalidInput("Non-binary data.", str[i], i);
             }
             if( temp.length == 32 ){
+                temp = this.endian(temp, this.byteSize, 32/this.byteSize);
                 var codepoint = jsnum.fromBin(temp);
                 try{
                     out += String.fromCodePoint(codepoint);
@@ -42,5 +56,5 @@ conversions["utf32"] = {
             state.truncatedInput(null, "bit", temp.length, 32);
         }
         return out;
-    }
+    };
 }
