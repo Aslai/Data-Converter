@@ -1,3 +1,8 @@
+
+var autoupdate = function(){
+    
+}
+
 function getRadioSelection( name, defaultVal ){
     var objs = document.getElementsByName(name);
 
@@ -26,6 +31,7 @@ function updateInput(){
     }
     document.getElementById("conv_in").placeholder = fmt_in_set[fmt_in].placeholder;
     dumpcfg(document.getElementById("opts_in"), fmt_in_set[fmt_in]);
+    autoupdate();
 }
 function updateOutput(){
     fmt_out = getRadioSelection("fmt_out", "binary");
@@ -33,6 +39,7 @@ function updateOutput(){
         fmt_out_set[fmt_out] = new conversions[fmt_out];
     }
     dumpcfg(document.getElementById("opts_out"), fmt_out_set[fmt_out]);
+    autoupdate();
 }
 updateInput()
 updateOutput();
@@ -41,15 +48,25 @@ registerEventByName("fmt_out", "onclick", updateOutput);
 
 registerEventByName("fmt_in", "onclick", updateInput);
 
+document.getElementById("conv_cvt").onclick = update;
 
-
-document.getElementById("conv_cvt").onclick = function(){
+function update(){
     var data = document.getElementById("conv_in").value;
     //data = hex_to_bin(data);
     data = fmt_in_set[fmt_in].toBin(data);
     data = fmt_out_set[fmt_out].fromBin(data);
     document.getElementById("conv_out").value = data;
 }
+
+
+autoupdate = function(){
+    if( document.getElementById("autoUpdate").checked == true ){
+        update();
+    }
+}
+
+document.getElementById("conv_in").onchange = autoupdate;
+document.getElementById("conv_in").onkeyup = autoupdate;
 
 state.notice = function( msg ){
     document.getElementById("diagnostics").innerHTML += msg + "\n";
@@ -71,6 +88,7 @@ function dumpcfgcombo( dest, obj, item ){
 					obj[prop] = arr[prop];
 				}
                 item.selected = select.value;
+                autoupdate();
 			}
 		})(obj, item, data, select);
 	dest.appendChild(select);
@@ -94,6 +112,7 @@ function dumpcfgtext( dest, obj, item ){
 			return function(){
                 obj[item.set] = txt.value;
                 item.selected = txt.value;
+                autoupdate();
 			}
 		})(obj, item, txt);
 	dest.appendChild(txt);
@@ -120,13 +139,3 @@ function dumpcfg(dest, obj){
 	}
 }
 
-
-var b = new bignum(10);
-var c = new bignum(10);
-c.set("8192");
-b.set("10111");
-    b.print();
-for( var i = 0; i < 1; ++i ){
-    //b.sub(c);
-    b.print();
-}
