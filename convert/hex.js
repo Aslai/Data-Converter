@@ -7,6 +7,19 @@ conversions["hexstream"] = function(){
         "1100", "1101", "1110", "1111"
     ];
     this.placeholder = "48 65 78 20 64 61 74 61 20 68 65 72 65 2e 2e 2e ...";
+    this.pad = 0;
+    this.config = [
+        { 
+            name: "Auto Pad:",
+            type: "combo",
+            selected: 0,
+            options: [
+                { name: "None", set: { pad: "none" } },
+                { name: "Beginning", set: { pad: "beginning" } },
+                { name: "End", set: { pad: "end" } },
+            ]
+        }
+    ];
 
     this.toBin = function ( input ){
         var out = "";
@@ -29,6 +42,16 @@ conversions["hexstream"] = function(){
         var temp = "";
         var count = 0;
         var i;
+        if( this.pad == "beginning" ){
+            if( str.length % 4 != 0 ){
+                str = Array(5 - str.length % 4).join("0") + str;
+            }
+        }
+        else if( this.pad == "end" ){
+            if( str.length % 4 != 0 ){
+                str = str + Array(5 - str.length % 4).join("0");
+            }
+        }
         for( i = 0; i < str.length; ++i ){
             if( str[i] == "0" || str[i] == "1" ){
                 temp += str[i];

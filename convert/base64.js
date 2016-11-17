@@ -47,8 +47,8 @@ conversions["base64"] = function(){
         var count = 0;
         var i;
         var alpha = this.alphabet + this.last;
-        while( str.length % 6 != 0 ){
-            str += "0";
+        if( str.length % 6 != 0 ){
+            str += Array(7 - str.length % 6).join("0");
         }
         for( i = 0; i < str.length; ++i ){
             if( str[i] == "0" || str[i] == "1" ){

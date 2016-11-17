@@ -119,3 +119,14 @@ function dumpcfg(dest, obj){
 		dest.appendChild(div);
 	}
 }
+
+
+var b = new bignum(10);
+var c = new bignum(10);
+c.set("8192");
+b.set("10111");
+    b.print();
+for( var i = 0; i < 1; ++i ){
+    //b.sub(c);
+    b.print();
+}
