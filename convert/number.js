@@ -2,6 +2,8 @@ conversions["number"] = function(){
     this.base = 10;
     this.width = 32;
     this.placeholder = "1234567 ...";
+    this.endian = format.endian.big;
+    this.byteSize = 8;
     this.fmt = 0;
     this.config = [
         { 
@@ -15,23 +17,43 @@ conversions["number"] = function(){
             type: "combo",
             selected: 0,
             options: [
-                { name: "Standard Base 2", set: { fmt: 0 } },
-                { name: "2's Complement", set: { fmt: 3 } },
+                { name: "Unfixed (MSB=sign)", set: { fmt: 0 } },
+                { name: "Fixed Unsigned", set: { fmt: 5 } },
+                { name: "Fixed 2's Complement", set: { fmt: 3 } },
+                { name: "Fixed 1's Complement", set: { fmt: 4 } },
                 { name: "Exp. Golomb", set: { fmt: 1 } },
                 { name: "Signed Exp. Golomb", set: { fmt: 2 } },
             ]
         },
         { 
-            name: "Width:",
+            name: "Width (bytes):",
             type: "text",
-            selected: 32,
-            set: "width",
-            enable_if: [{fmt: [3]}]
+            selected: 4,
+            set: "widthBytes",
+            enable_if: [{fmt: [3, 4, 5]}]
         },
+        { 
+            name: "Endianness:",
+            type: "combo",
+            selected: 0,
+            options: [
+                { name: "Little Endian", set: { endian: format.endian.little } },
+                { name: "Big Endian", set: { endian: format.endian.big } }
+            ],
+            enable_if: [{fmt: [3, 4, 5]}]
+        },
+        { 
+            name: "Byte Size:",
+            type: "text",
+            selected: 8,
+            set: "byteSize",
+            enable_if: [{fmt: [3, 4, 5]}]
+        }
         
     ];
     
     this.toBin = function ( str ){
+        this.width = this.widthBytes * this.byteSize;
         var str2 = "";
         var alphabet = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         alphabet = alphabet.substr(0, this.base + 1);
@@ -43,10 +65,37 @@ conversions["number"] = function(){
                 state.invalidInput(null, str[i], i);
             }
         }
-        var out = bigInt(str2, this.base);
+        try{
+            var out = bigInt(str2, this.base);
+        }
+        catch(e){
+            state.invalidInput("Unrecognized number",  str, 0);
+            return "";
+        }
         if( this.fmt == 0 ){ 
             out = out.toString(2);
+            if( out[0] == "-" ){
+                out = "1" + out.substr(1);
+            }
+            else if( out[0] == "1" ){
+                out = "0" + out;
+            }
             return out;
+        }
+        if( this.fmt == 5 ){ 
+            if( out.isNegative() ){
+                state.invalidInput("Negative number passed as unsigned",  str, 0);
+                return "";
+            }
+            out = out.toString(2);
+            if( out.length >= this.width ){
+                state.invalidInput("Overflow", 1, 1);
+                out = out.substr(out.length - this.width);
+            }
+            else{
+                out = Array(parseInt(this.width) + 1 - out.length).join("0") + out;
+            }
+            return this.endian(out, this.byteSize, this.widthBytes);
         }
         if( this.fmt == 3 ){ 
             if( out.isNegative() ){
@@ -67,14 +116,45 @@ conversions["number"] = function(){
                         out2 += "0";
                     }
                 }
-                return out2;
+                return this.endian(out2, this.byteSize, this.widthBytes);
             }
             out = out.toString(2);
             if( out.length >= this.width ){
                 state.invalidInput("Overflow", 1, 1);
-                return out.substr(out.length - this.width);
+                return this.endian(out.substr(out.length - this.width), this.byteSize, this.widthBytes);
             }
-            return Array(parseInt(this.width) + 1 - out.length).join("0") + out;
+            return this.endian(Array(parseInt(this.width) + 1 - out.length).join("0") + out, this.byteSize, this.widthBytes);
+        }
+        if( this.fmt == 4 ){ 
+            if( out.isNegative() ){
+                out = out.abs().toString(2);
+                if( out.length >= this.width ){
+                    state.invalidInput("Overflow", 1, 1);
+                    out = out.substr(out.length - this.width);
+                }
+                else{
+                    out = Array(parseInt(this.width) + 1 - out.length).join("0") + out;
+                }
+                var out2 = "";
+                for( var i = 0; i < out.length; ++i ){
+                    if( out[i] == "0" ){
+                        out2 += "1";
+                    }
+                    else{
+                        out2 += "0";
+                    }
+                }
+                return this.endian(out2, this.byteSize, this.widthBytes);
+            }
+            if( out.isZero() && str2[0] == "-" ){
+                return this.endian(Array(parseInt(this.width) + 1).join("1"), this.byteSize, this.widthBytes);
+            }
+            out = out.toString(2);
+            if( out.length >= this.width ){
+                state.invalidInput("Overflow", 1, 1);
+                return this.endian( out.substr(out.length - this.width), this.byteSize, this.widthBytes);
+            }
+            return this.endian( Array(parseInt(this.width) + 1 - out.length).join("0") + out, this.byteSize, this.widthBytes);
         }
         if( this.fmt == 1 ){
             out = out.add(1).toString(2);
@@ -88,10 +168,10 @@ conversions["number"] = function(){
             out = out.abs().multiply(2).add(add).toString(2);
             return Array(out.length).join("0") + out;
         }
-        
     };
 
     this.fromBin = function ( str ){
+        this.width = this.widthBytes * this.byteSize;
         var out = "";
         var temp = "";
         var i;
@@ -114,10 +194,20 @@ conversions["number"] = function(){
             }
         }
         if( this.fmt == 0 ){ 
+            if( temp[0] == "1" ){
+                return bigInt(temp.substr(1), 2).multiply(-1).toString(this.base);
+            }
+            return bigInt(temp, 2).toString(this.base);
+        }
+        if( this.fmt == 5 ){
+            temp = this.endian(temp.substr(0, this.width), this.byteSize, this.widthBytes);
+            if( temp.length < this.width ){
+                state.invalidInput("Insufficient data", 1, 1);
+            }
             return bigInt(temp, 2).toString(this.base);
         }
         if( this.fmt == 3 ){ 
-            temp = temp.substr(0, this.width);
+            temp = this.endian(temp.substr(0, this.width), this.byteSize, this.widthBytes);
             if( temp.length < this.width ){
                 state.invalidInput("Insufficient data", 1, 1);
             }
@@ -134,6 +224,29 @@ conversions["number"] = function(){
                 }
             }
             return bigInt(out2, 2).add(1).multiply(-1).toString(this.base);
+        }
+        if( this.fmt == 4 ){ 
+            temp = this.endian(temp.substr(0, this.width), this.byteSize, this.widthBytes);
+            if( temp.length < this.width ){
+                state.invalidInput("Insufficient data", 1, 1);
+            }
+            if( temp[0] == "0" ){
+                return bigInt(temp, 2).toString(this.base);
+            }
+            var out2 = "";
+            for( var i = 0; i < temp.length; ++i ){
+                if( temp[i] == "0" ){
+                    out2 += "1";
+                }
+                else{
+                    out2 += "0";
+                }
+            }
+            var out = bigInt(out2, 2);
+            if( out.isZero() ){
+                return "-0";
+            }
+            return out.multiply(-1).toString(this.base);
         }
         if( this.fmt == 1 ){
             temp = temp.substr(leading, leading + 1);
