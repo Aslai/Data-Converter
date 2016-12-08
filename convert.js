@@ -65,6 +65,7 @@ function updatecfg(dest){
 }
 
 autoupdate = function(){
+    document.getElementById("conv_in").placeholder = fmt_in_set[fmt_in].placeholder;
     updatecfg(document.getElementById("opts_in"));
     updatecfg(document.getElementById("opts_out"));
     if( document.getElementById("autoUpdate").checked == true ){

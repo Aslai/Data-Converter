@@ -42,5 +42,51 @@ var format = {
             }
             return out;
         }
+    },
+    encoding: {
+        percent: {
+            encode: function( str ){
+                try{
+                    return encodeURIComponent(str);
+                }
+                catch(e){
+                    return str;
+                }
+            },
+            decode: function( str ){
+                try{
+                    return decodeURIComponent(str);
+                }
+                catch(e){
+                    return str;
+                }
+            }
+        },
+        html_entities: {
+            encode: function( str ){
+                try{
+                    return he.encode(str, {useNamedReferences: true});
+                }
+                catch(e){
+                    return str;
+                }
+            },
+            decode: function( str ){
+                try{
+                    return he.decode(str);
+                }
+                catch(e){
+                    return str;
+                }
+            }
+        },
+        none: {
+            encode: function( str ){
+                return str;
+            },
+            decode: function( str ){
+                return str;
+            }
+        }
     }
 };
